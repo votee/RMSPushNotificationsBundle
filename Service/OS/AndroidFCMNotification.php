@@ -69,12 +69,14 @@ class AndroidFCMNotification implements OSNotificationServiceInterface
     {
         $this->apiKey = $apiKey;
         if (!$client) {
-            $client = ($useMultiCurl ? new MultiCurl() : new Curl());
+            $options = [
+                'timeout' => $timeout,
+                'verify' => false,
+            ];
+            $client = ($useMultiCurl ? new MultiCurl($options) : new Curl($options));
         }
-        $client->setTimeout($timeout);
 
         $this->browser = new Browser($client);
-        $this->browser->getClient()->setVerifyPeer(false);
         $this->logger = $logger;
     }
 
@@ -102,7 +104,7 @@ class AndroidFCMNotification implements OSNotificationServiceInterface
             $message->getFCMOptions(),
             array("data" => $message->getData())
         );
-        
+
         // Perform the calls (in parallel)
         $this->responses = array();
         $fcmIdentifiers = $message->getFCMIdentifiers();
