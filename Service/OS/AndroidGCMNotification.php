@@ -81,7 +81,7 @@ class AndroidGCMNotification implements OSNotificationServiceInterface
             $options = [
                 'timeout' => $timeout,
                 'verify_peer' => false,
-            ]
+            ];
             $client = ($useMultiCurl ? new MultiCurl($options) : new Curl($options));
         }
 
