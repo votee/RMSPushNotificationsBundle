@@ -77,7 +77,7 @@ class AndroidNotification implements OSNotificationServiceInterface
         }
 
         if ($this->getAuthToken()) {
-            $headers[] = "Authorization: GoogleLogin auth=" . $this->authToken;
+            $headers["Authorization"] = "GoogleLogin auth=" . $this->authToken;
             $data = $message->getMessageBody();
 
             $buzz = new Browser();
@@ -85,7 +85,7 @@ class AndroidNotification implements OSNotificationServiceInterface
             $buzz->getClient()->setTimeout($this->timeout);
             $response = $buzz->post("https://android.apis.google.com/c2dm/send", $headers, http_build_query($data));
 
-            return preg_match("/^id=/", $response->getContent()) > 0;
+            return preg_match("/^id=/", $response->getBody()) > 0;
         }
 
         return false;
@@ -114,7 +114,7 @@ class AndroidNotification implements OSNotificationServiceInterface
             return false;
         }
 
-        preg_match("/Auth=([a-z0-9_\-]+)/i", $response->getContent(), $matches);
+        preg_match("/Auth=([a-z0-9_\-]+)/i", $response->getBody(), $matches);
         $this->authToken = $matches[1];
 
         return true;

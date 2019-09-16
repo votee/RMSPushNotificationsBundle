@@ -97,8 +97,8 @@ class AndroidFCMNotification implements OSNotificationServiceInterface
         }
 
         $headers = array(
-            "Authorization: key=" . $this->apiKey,
-            "Content-Type: application/json",
+            "Authorization" => "key=" . $this->apiKey,
+            "Content-Type" => "application/json",
         );
         $data = array_merge(
             $message->getFCMOptions(),
@@ -130,10 +130,10 @@ class AndroidFCMNotification implements OSNotificationServiceInterface
 
         // Determine success
         foreach ($this->responses as $response) {
-            $message = json_decode($response->getContent());
+            $message = json_decode($response->getBody());
             if ($message === null || $message->success == 0 || $message->failure > 0) {
                 if ($message == null) {
-                    $this->logger->error($response->getContent());
+                    $this->logger->error($response->getBody());
                 } else {
                     foreach ($message->results as $result) {
                         if (isset($result->error)) {

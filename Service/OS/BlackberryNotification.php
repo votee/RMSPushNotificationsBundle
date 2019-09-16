@@ -101,9 +101,9 @@ class BlackberryNotification implements OSNotificationServiceInterface
             $url = "https://pushapi.eval.blackberry.com/mss/PD_pushRequest";
         }
         $headers = array();
-        $headers[] = "Content-Type: multipart/related; boundary={$separator}; type=application/xml";
-        $headers[] = "Accept: text/html, *";
-        $headers[] = "Connection: Keep-Alive";
+        $headers["Content-Type"] = "multipart/related; boundary={$separator}; type=application/xml";
+        $headers["Accept"] = "text/html, *";
+        $headers["Connection"] = "Keep-Alive";
 
         $response = $browser->post($url, $headers, $body);
 
@@ -152,7 +152,7 @@ class BlackberryNotification implements OSNotificationServiceInterface
             return false;
         }
         $doc = new \DOMDocument();
-        $doc->loadXML($response->getContent());
+        $doc->loadXML($response->getBody());
         $elems = $doc->getElementsByTagName("response-result");
         if (!$elems->length) {
             $this->logger->error('Response is empty');
