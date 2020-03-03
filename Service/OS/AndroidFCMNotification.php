@@ -2,6 +2,7 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Log\LoggerInterface;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException,
     RMS\PushNotificationsBundle\Message\AndroidMessage,
@@ -68,15 +69,16 @@ class AndroidFCMNotification implements OSNotificationServiceInterface
     public function __construct($apiKey, $useMultiCurl, $timeout, $logger, AbstractCurl $client = null)
     {
         $this->apiKey = $apiKey;
+        $factory = new Psr17Factory();
         if (!$client) {
             $options = [
                 'timeout' => $timeout,
                 'verify' => false,
             ];
-            $client = ($useMultiCurl ? new MultiCurl($options) : new Curl($options));
+            $client = ($useMultiCurl ? new MultiCurl($factory, $options) : new Curl($factory, $options));
         }
 
-        $this->browser = new Browser($client);
+        $this->browser = new Browser($client, $factory);
         $this->logger = $logger;
     }
 

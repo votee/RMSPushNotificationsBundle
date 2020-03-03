@@ -2,6 +2,7 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Log\LoggerInterface;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
 use RMS\PushNotificationsBundle\Message\WindowsphoneMessage;
@@ -31,7 +32,8 @@ class MicrosoftNotification implements OSNotificationServiceInterface
      */
     public function __construct($timeout, $logger)
     {
-        $this->browser = new Browser(new Curl());
+        $factory = new Psr17Factory();
+        $this->browser = new Browser(new Curl($factory), $factory);
         $this->browser->getClient()->setVerifyPeer(false);
         $this->browser->getClient()->setTimeout($timeout);
         $this->logger = $logger;

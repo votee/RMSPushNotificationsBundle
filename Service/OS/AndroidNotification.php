@@ -2,10 +2,13 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException,
     RMS\PushNotificationsBundle\Message\AndroidMessage,
     RMS\PushNotificationsBundle\Message\MessageInterface;
-use Buzz\Browser;
+use Buzz\Browser,
+    Buzz\Client\Curl,
+    Buzz\Client\MultiCurl;
 
 class AndroidNotification implements OSNotificationServiceInterface
 {
@@ -80,7 +83,13 @@ class AndroidNotification implements OSNotificationServiceInterface
             $headers["Authorization"] = "GoogleLogin auth=" . $this->authToken;
             $data = $message->getMessageBody();
 
-            $buzz = new Browser();
+            $factory = new Psr17Factory();
+            $options = [
+                'verify' => false,
+            ];
+            $client = ($useMultiCurl ? new MultiCurl($factory, $options) : new Curl($factory, $options));
+
+            $buzz = new Browser($client, $factory);
             $buzz->getClient()->setVerifyPeer(false);
             $buzz->getClient()->setTimeout($this->timeout);
             $response = $buzz->post("https://android.apis.google.com/c2dm/send", $headers, http_build_query($data));
@@ -106,7 +115,13 @@ class AndroidNotification implements OSNotificationServiceInterface
             "service"       => "ac2dm"
         );
 
-        $buzz = new Browser();
+        $factory = new Psr17Factory();
+        $options = [
+            'verify' => false,
+        ];
+        $client = ($useMultiCurl ? new MultiCurl($factory, $options) : new Curl($factory, $options));
+
+        $buzz = new Browser($client, $factory);
         $buzz->getClient()->setVerifyPeer(false);
         $buzz->getClient()->setTimeout($this->timeout);
         $response = $buzz->post("https://www.google.com/accounts/ClientLogin", array(), http_build_query($data));

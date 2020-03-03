@@ -2,6 +2,7 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Log\LoggerInterface;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException,
     RMS\PushNotificationsBundle\Message\BlackberryMessage,
@@ -91,7 +92,8 @@ class BlackberryNotification implements OSNotificationServiceInterface
     {
         $separator = "mPsbVQo0a68eIL3OAxnm";
         $body = $this->constructMessageBody($message, $separator);
-        $browser = new Browser(new Curl());
+        $factory = new Psr17Factory();
+        $browser = new Browser(new Curl($factory), $factory);
         $browser->getClient()->setTimeout($this->timeout);
         $listener = new BasicAuthListener($this->appID, $this->password);
         $browser->addListener($listener);
